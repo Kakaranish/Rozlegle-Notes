@@ -1,0 +1,27 @@
+$ set interfaces ge-0/0/1 vlan-tagging
+$ set routing-instances ROUTER{X} instance-type virtual-router
+$ set routing-instances ROUTER{X} routing-options router-id 192.0.{X}.162
+
+# Konfiguracja interfejsów
+$ set interfaces ge-0/0/1 unit {X}12 vlan-id {X}12
+$ set interfaces ge-0/0/1 unit {X}12 family inet address 1.{X}.1.1/24
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}12
+
+$ set interfaces ge-0/0/1 unit {X}10 vlan-id {X}10
+$ set interfaces ge-0/0/1 unit {X}10 family inet address 192.168.{X}.38/30
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}10
+
+$ set interfaces ge-0/0/1 unit {X}11 vlan-id {X}11
+$ set interfaces ge-0/0/1 unit {X}11 family inet address 192.168.{X}.42/30
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}11
+
+---  OSPF  ---------------------------------------------------------------------
+
+$ set routing-instances ROUTER{X} protocols ospf area 40
+$ set routing-instances ROUTER{X} protocols ospf area 40 nssa
+$ set routing-instances ROUTER{X} protocols ospf area 40 interface ge-0/0/1.{X}10
+$ set routing-instances ROUTER{X} protocols ospf area 40 interface ge-0/0/1.{X}11
+
+$ set policy-options prefix-list 160-PREFIX-LIST-{X} 1.{X}.1.0/24
+$ set policy-options policy-statement EXPORT-TO-OSPF-{X} term OD-160 from prefix-list 160-PREFIX-LIST-{X}
+$ set policy-options policy-statement EXPORT-TO-OSPF-{X} term OD-160 then accept

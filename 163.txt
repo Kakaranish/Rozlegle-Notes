@@ -1,0 +1,13 @@
+$ set interfaces ge-0/0/1 vlan-tagging
+$ set routing-instances ROUTER{X} instance-type virtual-router
+$ set routing-instances ROUTER{X} routing-options router-id 192.0.{X}.163
+
+$ set interfaces ge-0/0/1 unit {X}13 vlan-id {X}13
+$ set interfaces ge-0/0/1 unit {X}13 family inet address 192.168.{X}.46/30
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}13
+
+---  OSPF  ---------------------------------------------------------------------
+
+$ set routing-instances ROUTER{X} protocols ospf area 30
+$ set routing-instances ROUTER{X} protocols ospf area 30 interface ge-0/0/1.{X}13
+$ set routing-instances ROUTER{X} protocols ospf area 30 stub

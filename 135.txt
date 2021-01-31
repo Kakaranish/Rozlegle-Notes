@@ -1,0 +1,51 @@
+$ set interfaces ge-0/0/1 vlan-tagging
+$ set routing-instances ROUTER{X} instance-type virtual-router
+$ set routing-instances ROUTER{X} routing-options router-id 192.0.{X}.135
+
+# Konfiguracja interfejsów
+$ set interfaces ge-0/0/1 unit {X}04 vlan-id {X}04
+$ set interfaces ge-0/0/1 unit {X}04 family inet address 192.168.{X}.20/29
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}04
+
+---  OSPF  ---------------------------------------------------------------------
+
+$ set routing-instances ROUTER{X} protocols ospf area 0
+$ set routing-instances ROUTER{X} protocols ospf area 0 interface ge-0/0/1.{X}04
+
+---  BGP  ----------------------------------------------------------------------
+
+$ set routing-instances ROUTER{X} routing-options autonomous-system {X}
+
+# EBGP
+$ set interfaces ge-0/0/2 unit {X}50 vlan-id {X}50
+$ set interfaces ge-0/0/2 unit {X}50 family inet address 100.{X}.50.2/30
+$ set routing-instances ROUTER{X} interface ge-0/0/2.{X}50
+
+$ set routing-instances ROUTER{X} protocols bgp group DO_AS_110{X} type external
+$ set routing-instances ROUTER{X} protocols bgp group DO_AS_110{X} peer-as 110{X}
+$ set routing-instances ROUTER{X} protocols bgp group DO_AS_110{X} neighbor 100.{X}.50.1
+
+$ set policy-options policy-statement BGP-ANNOUNCE-{X} term 1 from route-filter 1.{X}.0.0/22 prefix-length-range /24-/24
+$ set policy-options policy-statement BGP-ANNOUNCE-{X} term 1 then accept
+$ set routing-instances ROUTER{X} protocols bgp group DO_AS_110{X} export BGP-ANNOUNCE-{X}
+
+$ set policy-options policy-statement IMPORT-1200-{X} term 1 from router-filter 1.2.0.0/24 exact
+$ set policy-options policy-statement IMPORT-1200-{X} term 1 then accept
+$ set routing-instances ROUTER{X} protocols bgp group DO_AS_110{X} import IMPORT-1200-{X}
+
+# IBGP
+$ set interfaces lo0.{X} family inet address 192.0.{X}.135/32
+$ set routing-instances ROUTER{X} interface lo0.{X}
+$ set routing-instances ROUTER{X} protocols ospf area 0 interface lo0.{X}
+
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL type internal
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL local-address 192.0.{X}.135
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.131
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.132
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.133
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.134
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.138
+
+$ set policy-options policy-statement BGP-NEXTHOP-{X} from protocol bgp
+$ set policy-options policy-statement BGP-NEXTHOP-{X} then next-hop self
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL export BGP-NEXTHOP-{X}

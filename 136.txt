@@ -1,0 +1,21 @@
+$ set interfaces ge-0/0/1 vlan-tagging
+$ set routing-instances ROUTER{X} instance-type virtual-router
+$ set routing-instances ROUTER{X} routing-options router-id 192.0.{X}.136
+
+# Konfiguracja interfejsów
+$ set interfaces ge-0/0/1 unit {X}04 vlan-id {X}04
+$ set interfaces ge-0/0/1 unit {X}04 family inet address 192.168.{X}.19/29
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}04
+
+$ set interfaces ge-0/0/1 unit {X}14 vlan-id {X}14
+$ set interfaces ge-0/0/1 unit {X}14 family inet address 1.{X}.0.1/24
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}14
+
+---  OSPF  ---------------------------------------------------------------------
+
+$ set routing-instances ROUTER{X} protocols ospf area 0
+$ set routing-instances ROUTER{X} protocols ospf area 0 interface ge-0/0/1.{X}04
+
+$ set policy-options policy-statement TO-OSPF-{X} from protocol direct
+$ set policy-options policy-statement TO-OSPF-{X} then accept
+$ set routing-instances ROUTER{X} protocols ospf export TO-OSPF-{X}

@@ -1,0 +1,20 @@
+$ set interfaces ge-0/0/1 vlan-tagging
+$ set routing-instances ROUTER{X} instance-type virtual-router
+$ set routing-instances ROUTER{X} routing-options router-id 192.0.{X}.130
+$ set routing-instances ROUTER{X} routing-options static route 0/0 next-hop 1.{X}.3.2
+
+# Konfiguracja interfejsów
+$ set interfaces ge-0/0/1 unit {X}09 vlan-id {X}09
+$ set interfaces ge-0/0/1 unit {X}09 family inet address 1.{X}.2.2/24
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}09
+
+$ set interfaces ge-0/0/1 unit {X}08 vlan-id {X}08
+$ set interfaces ge-0/0/1 unit {X}08 family inet address 1.{X}.3.1/24
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}08
+
+---  RIP  ----------------------------------------------------------------------
+
+$ set policy-options policy-statement RIP-POLICY-{X} from protocol direct
+$ set policy-options policy-statement RIP-POLICY-{X} then accept
+$ set routing-instances ROUTER{X} protocols rip group NEIGHBOR neighbor ge-0/0/1.{X}08
+$ set routing-instances ROUTER{X} protocols rip group NEIGHBOR export RIP-POLICY-{X}

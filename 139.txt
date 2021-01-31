@@ -1,0 +1,25 @@
+$ set interfaces ge-0/0/1 vlan-tagging
+$ set routing-instances ROUTER{X} instance-type virtual-router
+$ set routing-instances ROUTER{X} routing-options router-id 192.0.{X}.139
+
+# Konfiguracja interfejsów
+$ set interfaces ge-0/0/1 unit {X}08 vlan-id {X}08
+$ set interfaces ge-0/0/1 unit {X}08 family inet address 1.{X}.3.2/24
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}08
+
+$ set interfaces ge-0/0/1 unit {X}06 vlan-id {X}06
+$ set interfaces ge-0/0/1 unit {X}06 family inet address 192.168.{X}.30/30
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}06
+
+---  RIP  ----------------------------------------------------------------------
+
+$ set policy-options policy-statement RIP-TO-OSPF-{X} from protocol rip
+$ set policy-options policy-statement RIP-TO-OSPF-{X} from protocol direct
+$ set policy-options policy-statement RIP-TO-OSPF-{X} then accept
+$ set routing-instances ROUTER{X} protocols rip group NEIGHBOR neighbor ge-0/0/1.{X}08
+
+---  OSPF  ---------------------------------------------------------------------
+
+$ set routing-instances ROUTER{X} protocols ospf area 10
+$ set routing-instances ROUTER{X} protocols ospf area 10 interface ge-0/0/1.{X}06
+$ set routing-instances ROUTER{X} protocols ospf export RIP-TO-OSPF-{X}

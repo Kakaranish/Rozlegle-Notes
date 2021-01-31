@@ -1,0 +1,54 @@
+$ set interfaces ge-0/0/1 vlan-tagging
+$ set routing-instances ROUTER{X} instance-type virtual-router
+$ set routing-instances ROUTER{X} routing-options router-id 192.0.{X}.131
+
+# Konfiguracja interfejsów
+$ set interfaces ge-0/0/1 unit {X}06 vlan-id {X}06
+$ set interfaces ge-0/0/1 unit {X}06 family inet address 192.168.{X}.29/30
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}06
+
+$ set interfaces ge-0/0/1 unit {X}10 vlan-id {X}10
+$ set interfaces ge-0/0/1 unit {X}10 family inet address 192.168.{X}.37/30
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}10
+
+$ set interfaces ge-0/0/1 unit {X}03 vlan-id {X}03
+$ set interfaces ge-0/0/1 unit {X}03 family inet address 192.168.{X}.14/30
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}03
+
+$ set interfaces ge-0/0/1 unit {X}00 vlan-id {X}00
+$ set interfaces ge-0/0/1 unit {X}00 family inet address 192.168.{X}.1/30
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}00
+
+---  OSPF  ---------------------------------------------------------------------
+
+$ set routing-instances ROUTER{X} protocols ospf area 0
+$ set routing-instances ROUTER{X} protocols ospf area 0 interface ge-0/0/1.{X}00
+$ set routing-instances ROUTER{X} protocols ospf area 0 interface ge-0/0/1.{X}03
+
+$ set routing-instances ROUTER{X} protocols ospf area 10
+$ set routing-instances ROUTER{X} protocols ospf area 10 interface ge-0/0/1.{X}06
+
+$ set routing-instances ROUTER{X} protocols ospf area 40
+$ set routing-instances ROUTER{X} protocols ospf area 40 interface ge-0/0/1.{X}10
+
+---  BGP  ----------------------------------------------------------------------
+
+$ set routing-instances ROUTER{X} routing-options autonomous-system {X}
+
+# IBGP
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL type internal
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL local-address 192.0.{X}.131
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.132
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.133
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.134
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.135
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.138
+
+$ set interfaces lo0.{X} family inet address 192.0.{X}.131/32
+$ set routing-instances ROUTER{X} interface lo0.{X}
+$ set routing-instances ROUTER{X} protocols ospf area 0 interface lo0.{X}
+
+$ set policy-options policy-statement BGP-ANNOUNCE-{X} term 1 from route filter 1.{X}.0.0/22 prefix-length /24-/24
+$ set policy-options policy-statement BGP-ANNOUNCE-{X} term 1 then accept
+$ set policy-options policy-statement BGP-ANNOUNCE-{X} term 1 then local-preference add 10
+$ set routing-instances ROUTER{X} protocols bgp export BGP-ANNOUNCE-{X}

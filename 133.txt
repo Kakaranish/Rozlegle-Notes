@@ -1,0 +1,55 @@
+$ set interfaces ge-0/0/1 vlan-tagging
+$ set routing-instances ROUTER{X} instance-type virtual-router
+$ set routing-instances ROUTER{X} routing-options router-id 192.0.{X}.133
+
+# Konfiguracja interfejsów
+$ set interfaces ge-0/0/1 unit {X}01 vlan-id {X}01
+$ set interfaces ge-0/0/1 unit {X}01 family inet address 192.168.{X}.6/30
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}01
+
+$ set interfaces ge-0/0/1 unit {X}02 vlan-id {X}02
+$ set interfaces ge-0/0/1 unit {X}02 family inet address 192.168.{X}.10/30
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}02
+
+$ set interfaces ge-0/0/1 unit {X}04 vlan-id {X}04
+$ set interfaces ge-0/0/1 unit {X}04 family inet address 192.168.{X}.18/29
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}04
+
+$ set interfaces ge-0/0/1 unit {X}05 vlan-id {X}05
+$ set interfaces ge-0/0/1 unit {X}05 family inet address 192.168.{X}.25/30
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}05
+
+---  OSPF  ---------------------------------------------------------------------
+
+$ set routing-instances ROUTER{X} protocols ospf area 0
+$ set routing-instances ROUTER{X} protocols ospf area 0 interface ge-0/0/1.{X}01
+$ set routing-instances ROUTER{X} protocols ospf area 0 interface ge-0/0/1.{X}02
+$ set routing-instances ROUTER{X} protocols ospf area 0 interface ge-0/0/1.{X}04
+$ set routing-instances ROUTER{X} protocols ospf area 0 interface ge-0/0/1.{X}05 passive
+
+---  BGP  ----------------------------------------------------------------------
+
+$ routing-instances ROUTER{X} routing-options autonomous-system {X}
+
+# IBGP
+$ set interfaces lo0.{X} family inet address 192.0.{X}.133/32
+$ set routing-instances ROUTER{X} interface lo0.{X}
+$ set routing-instances ROUTER{X} protocols ospf area 0 interface lo0.{X}
+
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL type internal
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL local-address 192.0.{X}.133
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.131
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.132
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.134
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.135
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.138
+
+$ set policy-options prefix-list MOJA-LISTA-{X} 1.{X}.0.0/24
+$ set policy-options prefix-list MOJA-LISTA-{X} 1.{X}.1.0/24
+$ set policy-options prefix-list MOJA-LISTA-{X} 1.{X}.2.0/24
+$ set policy-options prefix-list MOJA-LISTA-{X} 1.{X}.3.0/24
+$ set policy-options prefix-list MOJA-LISTA-{X} 1.{X}.4.0/24
+
+$ set policy-options policy-statement BGP-Announce-{X} term NASZE-SIECI from prefix-list MOJA-LISTA-{X}
+$ set policy-options policy-statement BGP-Announce-{X} term NASZE-SIECI then accept
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL export BGP-Announce-{X}

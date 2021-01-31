@@ -1,0 +1,44 @@
+$ set interfaces ge-0/0/1 vlan-tagging
+$ set routing-instances ROUTER{X} instance-type virtual-router
+$ set routing-instances ROUTER{X} routing-options router-id 192.0.{X}.138
+
+# Konfiguracja interfejsów
+$ set interfaces ge-0/0/1 unit {X}07 vlan-id {X}07
+$ set interfaces ge-0/0/1 unit {X}07 family inet address 192.168.{X}.34/30
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}07
+
+---  OSPF  ---------------------------------------------------------------------
+
+$ set routing-instances ROUTER{X} protocols ospf area 20
+$ set routing-instances ROUTER{X} protocols ospf area 20 interface ge-0/0/1.{X}07
+$ set routing-instances ROUTER{X} protocols ospf area 20 stub
+
+---  BGP  ----------------------------------------------------------------------
+
+$ set routing-instances ROUTER{X} routing-options autonomous-system {X}
+
+# EBGP
+$ set interfaces ge-0/0/2 unit {X}51 vlan-id {X}51
+$ set interfaces ge-0/0/2 unit {X}51 family inet address 100.{X}.51.2/30
+$ set routing-instances ROUTER{X} interface ge-0/0/2.{X}51
+
+$ set routing-instances ROUTER{X} protocols bgp group DO_AS_111{X} type external
+$ set routing-instances ROUTER{X} protocols bgp group DO_AS_111{X} peer-as 111{X}
+$ set routing-instances ROUTER{X} protocols bgp group DO_AS_111{X} neighbor 100.{X}.51.1
+
+$ set policy-options policy-statement BGP-ANNOUNCE-{X} term 1 from route-filter 1.{X}.0.0/22 prefix-length-range /24-/24
+$ set policy-options policy-statement BGP-ANNOUNCE-{X} term 1 then accept
+$ set routing-instances ROUTER{X} protocols bgp group DO_AS_111{X} export BGP-ANNOUNCE-{X}
+
+# IBGP
+$ set interfaces lo0.{X} family inet address 192.0.{X}.138/32
+$ set routing-instances ROUTER{X} interface lo0.{X}
+$ set routing-instances ROUTER{X} protocols ospf area 20 interface lo0.{X}
+
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL type internal
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL local-address 192.0.{X}.138
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.131
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.132
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.133
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.134
+$ set routing-instances ROUTER{X} protocols bgp group INTERNAL neighbor 192.0.{X}.135

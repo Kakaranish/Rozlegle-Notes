@@ -1,0 +1,9 @@
+$ set interfaces ge-0/0/1 vlan-tagging
+$ set routing-instances ROUTER{X} instance-type virtual-router
+$ set routing-instances ROUTER{X} routing-options router-id 192.0.{X}.161
+$ set routing-instances ROUTER{X} routing-options static route 0/0 next-hop 1.{X}.2.2
+
+# Konfiguracja interfejsów
+$ set interfaces ge-0/0/1 unit {X}09 vlan-id {X}09
+$ set interfaces ge-0/0/1 unit {X}09 family inet address 1.{X}.2.1/24
+$ set routing-instances ROUTER{X} interface ge-0/0/1.{X}09
