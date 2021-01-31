@@ -1,0 +1,27 @@
+---  General  ------------------------------------------------------------------
+
+$ show interfaces
+$ show routing-instances
+$ show routing-instances ROUTER{X}
+$ run show route table ROUTER{X}
+
+$ show policy-options
+$ run show policy BGP-ANNOUNCE-{X}
+
+$ run ping 2.1.7.3 routing-instance ROUTER{X}
+$ run ping 2.1.7.3 source 3.2.8.4 routing-instance ROUTER{X}
+
+---  OSPF  ---------------------------------------------------------------------
+
+$ run show ospf neighbor instance ROUTER{X}
+$ run show ospf interface instance ROUTER{X}
+$ run show ospf database instance ROUTER{X}
+$ run show ospf database lsa-id 192.0.{X}.133 instance ROUTER{X} detail
+
+$ run clear ospf database instance ROUTER{X} purge
+
+---  BGP  ----------------------------------------------------------------------
+
+$ run show bgp summary
+$ run show bgp summary instance ROUTER{X}
+$ run show bgp neighbor instance ROUTER{X}
